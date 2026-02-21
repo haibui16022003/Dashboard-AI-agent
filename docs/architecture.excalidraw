@@ -1,0 +1,497 @@
+﻿{
+    "elements":  [
+                     {
+                         "id":  "mlwkqvngwmtuieoq2z",
+                         "type":  "text",
+                         "x":  250,
+                         "y":  80,
+                         "width":  600,
+                         "height":  25,
+                         "strokeColor":  "#868e96",
+                         "text":  "Structured Actions \u003e Evidence.dev Input Store \u003e Reactive SQL",
+                         "fontSize":  16,
+                         "createdAt":  "2026-02-21T17:10:03.196Z",
+                         "updatedAt":  "2026-02-21T17:10:03.196Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqvu379q7uxzq1af",
+                         "type":  "rectangle",
+                         "x":  50,
+                         "y":  220,
+                         "width":  140,
+                         "height":  70,
+                         "backgroundColor":  "#a5d8ff",
+                         "strokeColor":  "#1971c2",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:03.435Z",
+                         "updatedAt":  "2026-02-21T17:10:03.435Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqvznwn17tjmgs68",
+                         "type":  "text",
+                         "x":  70,
+                         "y":  240,
+                         "width":  100,
+                         "height":  30,
+                         "strokeColor":  "#1971c2",
+                         "text":  "User",
+                         "fontSize":  24,
+                         "createdAt":  "2026-02-21T17:10:03.635Z",
+                         "updatedAt":  "2026-02-21T17:10:03.635Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqw3u7qngp4pqn3k",
+                         "type":  "rectangle",
+                         "x":  300,
+                         "y":  200,
+                         "width":  180,
+                         "height":  110,
+                         "backgroundColor":  "#d0bfff",
+                         "strokeColor":  "#7048e8",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:03.786Z",
+                         "updatedAt":  "2026-02-21T17:10:03.786Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqw6b7ndupxdegfl",
+                         "type":  "text",
+                         "x":  315,
+                         "y":  215,
+                         "width":  150,
+                         "height":  80,
+                         "strokeColor":  "#5f3dc4",
+                         "text":  "AgentChat.svelte\nChat UI\nWebSocket Client",
+                         "fontSize":  14,
+                         "createdAt":  "2026-02-21T17:10:03.875Z",
+                         "updatedAt":  "2026-02-21T17:10:03.875Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqw9ore2w4ubdsmb",
+                         "type":  "rectangle",
+                         "x":  600,
+                         "y":  170,
+                         "width":  220,
+                         "height":  170,
+                         "backgroundColor":  "#b2f2bb",
+                         "strokeColor":  "#2f9e44",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:03.996Z",
+                         "updatedAt":  "2026-02-21T17:10:03.996Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwcfrt1gorhvjw",
+                         "type":  "text",
+                         "x":  615,
+                         "y":  185,
+                         "width":  190,
+                         "height":  140,
+                         "strokeColor":  "#2b8a3e",
+                         "text":  "FastAPI Backend\n-----------\nGemini 2.5 Flash\nAction Validator\nWebSocket Manager",
+                         "fontSize":  14,
+                         "createdAt":  "2026-02-21T17:10:04.095Z",
+                         "updatedAt":  "2026-02-21T17:10:04.095Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwg16glznamml4q",
+                         "type":  "rectangle",
+                         "x":  300,
+                         "y":  430,
+                         "width":  180,
+                         "height":  90,
+                         "backgroundColor":  "#ffec99",
+                         "strokeColor":  "#e67700",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:04.225Z",
+                         "updatedAt":  "2026-02-21T17:10:04.225Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwitz9hnnxjw7sq",
+                         "type":  "text",
+                         "x":  315,
+                         "y":  445,
+                         "width":  150,
+                         "height":  60,
+                         "strokeColor":  "#d9480f",
+                         "text":  "ActionListener.svelte\nSvelte Context Bridge",
+                         "fontSize":  14,
+                         "createdAt":  "2026-02-21T17:10:04.325Z",
+                         "updatedAt":  "2026-02-21T17:10:04.325Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwmzg8c32grq3w",
+                         "type":  "rectangle",
+                         "x":  600,
+                         "y":  430,
+                         "width":  220,
+                         "height":  90,
+                         "backgroundColor":  "#ffd8a8",
+                         "strokeColor":  "#e8590c",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:04.475Z",
+                         "updatedAt":  "2026-02-21T17:10:04.475Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwpss7m708c9l0a",
+                         "type":  "text",
+                         "x":  615,
+                         "y":  445,
+                         "width":  190,
+                         "height":  60,
+                         "strokeColor":  "#d9480f",
+                         "text":  "Evidence.dev\n Store + SQL",
+                         "fontSize":  16,
+                         "createdAt":  "2026-02-21T17:10:04.576Z",
+                         "updatedAt":  "2026-02-21T17:10:04.576Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwt3wkbivvzdby",
+                         "type":  "rectangle",
+                         "x":  920,
+                         "y":  430,
+                         "width":  180,
+                         "height":  90,
+                         "backgroundColor":  "#ffc9c9",
+                         "strokeColor":  "#c92a2a",
+                         "roundness":  {
+                                           "type":  3
+                                       },
+                         "fillStyle":  "solid",
+                         "createdAt":  "2026-02-21T17:10:04.695Z",
+                         "updatedAt":  "2026-02-21T17:10:04.695Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwvlrmstb8d1uj",
+                         "type":  "text",
+                         "x":  935,
+                         "y":  445,
+                         "width":  150,
+                         "height":  60,
+                         "strokeColor":  "#c92a2a",
+                         "text":  "Dashboard\nCharts and Tables",
+                         "fontSize":  16,
+                         "createdAt":  "2026-02-21T17:10:04.785Z",
+                         "updatedAt":  "2026-02-21T17:10:04.785Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqwzhjtuqe9i2av",
+                         "type":  "arrow",
+                         "x":  190,
+                         "y":  255,
+                         "width":  110,
+                         "height":  0,
+                         "strokeColor":  "#1971c2",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            110,
+                                            0
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:04.925Z",
+                         "updatedAt":  "2026-02-21T17:10:04.925Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqx1pwirool0qa6",
+                         "type":  "text",
+                         "x":  200,
+                         "y":  232,
+                         "width":  90,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "Chat Input",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:05.005Z",
+                         "updatedAt":  "2026-02-21T17:10:05.005Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqx51yimcwcxz3rg",
+                         "type":  "arrow",
+                         "x":  480,
+                         "y":  240,
+                         "width":  120,
+                         "height":  0,
+                         "strokeColor":  "#7048e8",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            120,
+                                            0
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:05.125Z",
+                         "updatedAt":  "2026-02-21T17:10:05.125Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqx7j9e3rhafymtu",
+                         "type":  "text",
+                         "x":  490,
+                         "y":  218,
+                         "width":  100,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "HTTP POST",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:05.215Z",
+                         "updatedAt":  "2026-02-21T17:10:05.215Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxaljvqh21ibbv",
+                         "type":  "arrow",
+                         "x":  600,
+                         "y":  270,
+                         "width":  120,
+                         "height":  0,
+                         "strokeColor":  "#2f9e44",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            -120,
+                                            0
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:05.325Z",
+                         "updatedAt":  "2026-02-21T17:10:05.325Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxe742lk93vlgh5",
+                         "type":  "text",
+                         "x":  490,
+                         "y":  275,
+                         "width":  100,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "JSON Actions",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:05.455Z",
+                         "updatedAt":  "2026-02-21T17:10:05.455Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxh9pu234e0t98c",
+                         "type":  "arrow",
+                         "x":  390,
+                         "y":  310,
+                         "width":  0,
+                         "height":  120,
+                         "strokeColor":  "#e67700",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            0,
+                                            120
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:05.565Z",
+                         "updatedAt":  "2026-02-21T17:10:05.565Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxjhy386jj7nydq",
+                         "type":  "text",
+                         "x":  395,
+                         "y":  360,
+                         "width":  100,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "DOM Event",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:05.645Z",
+                         "updatedAt":  "2026-02-21T17:10:05.645Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxmtzprtleikv09",
+                         "type":  "arrow",
+                         "x":  480,
+                         "y":  475,
+                         "width":  120,
+                         "height":  0,
+                         "strokeColor":  "#e67700",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            120,
+                                            0
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:05.765Z",
+                         "updatedAt":  "2026-02-21T17:10:05.765Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxpd51yxfbqzio4",
+                         "type":  "text",
+                         "x":  490,
+                         "y":  453,
+                         "width":  100,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "[name]",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:05.857Z",
+                         "updatedAt":  "2026-02-21T17:10:05.857Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxsnacl5jg8ib4r",
+                         "type":  "arrow",
+                         "x":  820,
+                         "y":  475,
+                         "width":  100,
+                         "height":  0,
+                         "strokeColor":  "#e8590c",
+                         "strokeWidth":  2,
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            100,
+                                            0
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:05.975Z",
+                         "updatedAt":  "2026-02-21T17:10:05.975Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxv59cyudy6q19i",
+                         "type":  "text",
+                         "x":  830,
+                         "y":  453,
+                         "width":  80,
+                         "height":  20,
+                         "strokeColor":  "#495057",
+                         "text":  "SQL Re-run",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:06.065Z",
+                         "updatedAt":  "2026-02-21T17:10:06.065Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqxyrdy6hj609p9",
+                         "type":  "arrow",
+                         "x":  700,
+                         "y":  340,
+                         "width":  -200,
+                         "height":  90,
+                         "strokeColor":  "#2f9e44",
+                         "strokeWidth":  2,
+                         "strokeStyle":  "dashed",
+                         "points":  [
+                                        [
+                                            0,
+                                            0
+                                        ],
+                                        [
+                                            -200,
+                                            90
+                                        ]
+                                    ],
+                         "createdAt":  "2026-02-21T17:10:06.195Z",
+                         "updatedAt":  "2026-02-21T17:10:06.195Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkqy0zrdiq51qheno",
+                         "type":  "text",
+                         "x":  530,
+                         "y":  370,
+                         "width":  80,
+                         "height":  20,
+                         "strokeColor":  "#868e96",
+                         "text":  "WebSocket",
+                         "fontSize":  12,
+                         "createdAt":  "2026-02-21T17:10:06.275Z",
+                         "updatedAt":  "2026-02-21T17:10:06.275Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkrq8s7u33nf7jmpo",
+                         "type":  "text",
+                         "x":  250,
+                         "y":  75,
+                         "width":  600,
+                         "height":  25,
+                         "strokeColor":  "#868e96",
+                         "text":  "Structured Actions \u003e Evidence.dev Input Store \u003e Reactive SQL",
+                         "fontSize":  14,
+                         "createdAt":  "2026-02-21T17:10:42.844Z",
+                         "updatedAt":  "2026-02-21T17:10:42.844Z",
+                         "version":  1
+                     },
+                     {
+                         "id":  "mlwkrztypnwcjhplin9",
+                         "type":  "text",
+                         "x":  250,
+                         "y":  30,
+                         "width":  600,
+                         "height":  40,
+                         "strokeColor":  "#343a40",
+                         "text":  "AI Data Agent - Architecture Flow",
+                         "fontSize":  28,
+                         "createdAt":  "2026-02-21T17:10:55.270Z",
+                         "updatedAt":  "2026-02-21T17:10:55.270Z",
+                         "version":  1
+                     }
+                 ],
+    "appState":  {
+                     "viewBackgroundColor":  "#ffffff"
+                 },
+    "version":  2,
+    "type":  "excalidraw"
+}
