@@ -1,8 +1,9 @@
-"""FastAPI application — AI Action Agent backend.
+"""FastAPI application — AI Action Agent backend (V2).
 
 Endpoints
 ---------
-POST /agent/action   Accept a chat prompt, return structured dashboard actions.
+POST /agent/action   Accept a chat prompt + page context, return structured actions and/or data.
+GET  /page-summary/{page}   Return the parsed page description JSON.
 GET  /ws             WebSocket for broadcasting actions to the Evidence.dev frontend.
 GET  /health         Health-check.
 """
@@ -16,12 +17,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.llm import process_prompt
-from app.models.actions import AgentRequest, AgentResponse
+from app.models.api import AgentRequest, AgentResponse
 from app.services.agent_service import (
     ActionValidationError,
     generate_confirmation,
     validate_actions,
 )
+from app.services.page_context_service import format_context_for_llm, get_page_context
 from app.services.websocket_manager import ConnectionManager
 
 # ── Logging ──────────────────────────────────────────────────────────
@@ -36,8 +38,8 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="AI Action Agent",
-    description="Converts natural-language prompts into structured Evidence.dev dashboard actions.",
-    version="1.0.0",
+    description="Converts natural-language prompts into structured Evidence.dev dashboard actions and backend data queries.",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -58,35 +60,53 @@ async def health():
     """Health-check endpoint."""
     return {
         "status": "ok",
+        "version": "2.0.0",
         "websocket_connections": ws_manager.connection_count,
     }
 
 
+@app.get("/page-summary/{page_name}")
+async def page_summary(page_name: str):
+    """Return the parsed page description JSON for a given Evidence page."""
+    context = get_page_context(page_name)
+    if context is None:
+        return {"error": f"No page description found for '{page_name}'"}
+    return context
+
+
 @app.post("/agent/action", response_model=AgentResponse)
 async def agent_action(request: AgentRequest):
-    """Accept a natural-language prompt and return structured dashboard actions.
+    """Accept a natural-language prompt and return structured dashboard actions and/or data.
 
-    1. Send the prompt to Gemini with function-calling tools.
-    2. Validate the returned actions against the allow-list.
-    3. Broadcast validated actions to connected frontends via WebSocket.
-    4. Return a confirmation message + the action list to the chat UI.
+    Flow:
+    1. Load page context (filters, SQL queries, charts) from the JSON description.
+    2. Send the prompt + page context to Gemini with function-calling tools.
+    3. Validate returned dashboard actions against the allow-list.
+    4. Execute any data query (execute_query) via the metrics service.
+    5. Broadcast validated actions to connected frontends via WebSocket.
+    6. Return confirmation message + actions + data_result to the chat UI.
     """
-    logger.info("Received prompt: %s", request.prompt)
+    logger.info("Received prompt: %s  (page: %s)", request.prompt, request.page)
+
+    # 1. Load page context
+    page_ctx = get_page_context(request.page)
+    page_context_text = format_context_for_llm(page_ctx) if page_ctx else ""
 
     try:
-        # 1. LLM → structured actions
-        actions = await process_prompt(request.prompt)
+        # 2. LLM → structured actions + optional data result
+        actions, data_result = await process_prompt(request.prompt, page_context_text)
 
-        if not actions:
+        if not actions and data_result is None:
             return AgentResponse(
                 result="🤔 I couldn't determine the right action. Could you rephrase?",
                 actions=[],
             )
 
-        # 2. Validate
-        validate_actions(actions)
+        # 3. Validate dashboard actions
+        if actions:
+            validate_actions(actions)
 
-        # 3. Broadcast to frontend(s) via WebSocket
+        # 4. Broadcast dashboard actions via WebSocket
         for action in actions:
             await ws_manager.broadcast(
                 {
@@ -96,9 +116,14 @@ async def agent_action(request: AgentRequest):
             )
             logger.info("Broadcast action: %s", action.model_dump())
 
-        # 4. Confirmation
-        confirmation = generate_confirmation(actions)
-        return AgentResponse(result=confirmation, actions=actions)
+        # 5. Build confirmation message
+        confirmation = _build_response_message(actions, data_result)
+
+        return AgentResponse(
+            result=confirmation,
+            actions=actions,
+            data_result=data_result,
+        )
 
     except ActionValidationError as e:
         logger.warning("Action validation failed: %s", e)
@@ -114,6 +139,20 @@ async def agent_action(request: AgentRequest):
         )
 
 
+def _build_response_message(actions, data_result) -> str:
+    """Compose the final chat message from actions and/or data results."""
+    parts: list[str] = []
+
+    if actions:
+        from app.services.agent_service import generate_confirmation
+        parts.append(generate_confirmation(actions))
+
+    if data_result:
+        parts.append(f"📊 {data_result.summary}")
+
+    return "\n".join(parts) if parts else "✅ Done."
+
+
 # ── WebSocket ────────────────────────────────────────────────────────
 
 
@@ -123,8 +162,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:
         while True:
-            # Keep the connection alive; we don't expect client messages,
-            # but we need to await to detect disconnects.
             await websocket.receive_text()
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)

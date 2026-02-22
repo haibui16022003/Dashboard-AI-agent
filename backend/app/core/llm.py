@@ -1,4 +1,4 @@
-"""Gemini (Vertex AI) client with function/tool calling for dashboard actions."""
+"""Gemini (Vertex AI) client with function/tool calling for dashboard actions and data queries."""
 
 from __future__ import annotations
 
@@ -18,10 +18,12 @@ from app.models.actions import (
     NavigateAction,
     SetFiltersAction,
 )
+from app.models.data import DataResult
+from app.services.metrics_service import run_query
 
 logger = logging.getLogger(__name__)
 
-# ── Gemini function declarations (tool schema) ──────────────────────
+# ── Gemini function declarations ─────────────────────────────────────
 
 SET_FILTERS_DECL = types.FunctionDeclaration(
     name="set_filters",
@@ -106,32 +108,115 @@ EXPORT_DECL = types.FunctionDeclaration(
     ),
 )
 
+EXECUTE_QUERY_DECL = types.FunctionDeclaration(
+    name="execute_query",
+    description=(
+        "Execute a read-only SELECT SQL query against the dashboard's data backend "
+        "(Evidence parquet files via DuckDB). Use this for any DATA_QUESTION or the "
+        "data-retrieval step of a HYBRID intent. "
+        "You MUST write a valid DuckDB SQL SELECT statement. "
+        "Reference tables exactly as they appear in the page SQL queries context. "
+        "You may use functions like date_part(), date_trunc(), sum(), avg(), count(), etc. "
+        "Only SELECT is allowed — no INSERT, UPDATE, DELETE, DROP, or DDL."
+    ),
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "sql": types.Schema(
+                type=types.Type.STRING,
+                description=(
+                    "A valid DuckDB SELECT statement. "
+                    "Reference tables by their name as seen in the page SQL queries "
+                    "(e.g. 'orders' or 'needful_things__orders'). "
+                    "Example: SELECT category, SUM(sales) as total FROM orders GROUP BY category ORDER BY total DESC LIMIT 5"
+                ),
+            ),
+        },
+        required=["sql"],
+    ),
+)
+
 DASHBOARD_TOOLS = types.Tool(
     function_declarations=[
         SET_FILTERS_DECL,
         CLEAR_FILTERS_DECL,
         NAVIGATE_DECL,
         EXPORT_DECL,
+        EXECUTE_QUERY_DECL,
     ]
 )
 
 # ── System instruction ───────────────────────────────────────────────
 
-SYSTEM_INSTRUCTION = """\
-You are a dashboard assistant that controls an Evidence.dev business intelligence dashboard.
-You MUST respond ONLY by calling the provided functions — never produce free-text answers.
+_BASE_SYSTEM_INSTRUCTION = """\
+You are a BI assistant embedded inside an Evidence.dev analytics dashboard.
+You are NOT a chatbot. You are a controlled, deterministic analytics agent.
 
-Available dashboard controls:
-- category filter: accepts product categories (e.g. "Clothing", "Electronics", "Food", etc.)
-- year filter: accepts years as strings (e.g. "2019", "2020", "2021")
+════════════════════════════════════════
+INTENT DETECTION — READ THIS CAREFULLY
+════════════════════════════════════════
 
-Rules:
-1. Always call exactly one function per user request.
-2. When the user asks to "clear" or "reset" or "show all", use clear_filters.
-3. When the user mentions a category or year, use set_filters.
-4. When the user wants to go to a page, use navigate.
-5. When the user wants to download or export data, use export.
-6. If the user says "clear all filters", clear both "category" and "year".
+Every request falls into exactly ONE category:
+
+──────────────────────────────────────
+A. DASHBOARD_ACTION ONLY
+   Trigger: User wants to filter, navigate, clear, or export — NO data answer needed.
+   Examples:
+     "Filter for Clothing"           → call set_filters(category="Clothing")
+     "Show only 2020 data"           → call set_filters(year="2020")
+     "Clear all filters"             → call clear_filters(fields=["category","year"])
+     "Export as CSV"                 → call export(format="csv")
+   Response: call ONLY the dashboard action tool(s). Do NOT call execute_query.
+
+──────────────────────────────────────
+B. DATA_QUESTION ONLY
+   Trigger: User asks "what is", "how much", "which", "show me the total/average/max/min",
+            "top N", "rank", "compare" — WITHOUT specifying a filter that changes the view.
+   Examples:
+     "What is the total revenue?"         → call execute_query(sql="SELECT SUM(sales)...")
+     "Which category has highest sales?"  → call execute_query(sql="SELECT category, SUM(sales)...")
+     "Show top 5 months by revenue"       → call execute_query(sql="SELECT ... LIMIT 5")
+   Response: call ONLY execute_query. Do NOT call any dashboard action tool.
+
+──────────────────────────────────────
+C. HYBRID (filter + answer)
+   Trigger: User asks a DATA question AND specifies a filter dimension (year, category, etc.).
+   Examples:
+     "What is the total revenue in 2020?"
+     "What is the highest revenue month in 2020?"
+     "Which category sold the most in 2019?"
+     "Show me total sales for Clothing"
+
+   ⚠️ CRITICAL RULE FOR HYBRID:
+   You MUST call BOTH tools in THE SAME SINGLE RESPONSE — simultaneously, not one at a time.
+   In your response, emit TWO function calls:
+     1. set_filters(...)       ← filters come FIRST in the response
+     2. execute_query(sql=...) ← query comes SECOND in the same response
+
+   Do NOT wait for confirmation. Do NOT split into two turns.
+   Emit BOTH function calls in one response right now.
+
+   For "What is the total revenue in 2020?":
+     call 1 → set_filters(filters=[{"field":"year","value":"2020"}])
+     call 2 → execute_query(sql="SELECT SUM(sales) as total_revenue FROM orders WHERE date_part('year', order_datetime)=2020")
+
+   For "What is the highest revenue month in 2020?":
+     call 1 → set_filters(filters=[{"field":"year","value":"2020"}])
+     call 2 → execute_query(sql="SELECT date_trunc('month', order_datetime) as month, SUM(sales) as revenue FROM orders WHERE date_part('year', order_datetime)=2020 GROUP BY month ORDER BY revenue DESC LIMIT 1")
+
+════════════════════════════════════════
+SQL RULES (for execute_query)
+════════════════════════════════════════
+
+• Only SELECT — no INSERT, UPDATE, DELETE, DROP, CREATE, ALTER.
+• Use DuckDB functions: date_part(), date_trunc(), SUM(), AVG(), MAX(), MIN(), COUNT().
+• Reference tables by their name as shown in the page queries context (e.g. "orders").
+• Keep queries aggregated — no raw row dumps.
+• For year filters in SQL: use date_part('year', order_datetime) = {year} (integer, not string).
+
+════════════════════════════════════════
+PAGE CONTEXT (use as query guidance)
+════════════════════════════════════════
 """
 
 # ── Client initialisation ────────────────────────────────────────────
@@ -157,10 +242,9 @@ def _get_client() -> genai.Client:
     return _client
 
 
-# ── Public API ───────────────────────────────────────────────────────
+# ── Function call parsers ────────────────────────────────────────────
 
-
-def _parse_function_call(part: Any) -> DashboardAction | None:
+def _parse_dashboard_action(part: Any) -> DashboardAction | None:
     """Convert a Gemini function-call part into a typed DashboardAction."""
     fc = part.function_call
     if fc is None:
@@ -186,37 +270,91 @@ def _parse_function_call(part: Any) -> DashboardAction | None:
     if name == "export":
         return ExportAction(format=args.get("format", "csv"))
 
-    logger.warning("Unknown function call: %s", name)
     return None
 
 
-async def process_prompt(prompt: str) -> list[DashboardAction]:
-    """Send a user prompt to Gemini and extract structured DashboardActions.
+def _parse_execute_query(part: Any) -> DataResult | None:
+    """Execute a query tool call and return the DataResult."""
+    fc = part.function_call
+    if fc is None or fc.name != "execute_query":
+        return None
 
-    Returns a list of validated actions (usually just one).
+    args: dict = dict(fc.args) if fc.args else {}
+    sql: str = args.get("sql", "").strip()
+
+    if not sql:
+        logger.warning("execute_query called with empty SQL")
+        return None
+
+    logger.info("Executing agent-generated SQL: %s", sql[:200])
+    try:
+        result = run_query(sql)
+        return DataResult(
+            sql=result["sql"],
+            columns=result["columns"],
+            rows=result["rows"],
+            summary=result["summary"],
+        )
+    except (ValueError, RuntimeError) as e:
+        logger.error("Query execution failed: %s", e)
+        return DataResult(
+            sql=sql,
+            columns=[],
+            rows=[],
+            summary=f"⚠️ Query failed: {e}",
+        )
+
+
+# ── Public API ───────────────────────────────────────────────────────
+
+async def process_prompt(
+    prompt: str,
+    page_context_text: str = "",
+) -> tuple[list[DashboardAction], DataResult | None]:
+    """
+    Send a user prompt (with optional page context) to Gemini and extract:
+      - A list of DashboardActions (set_filters, clear_filters, navigate, export)
+      - An optional DataResult from execute_query
+
+    Returns:
+        (actions, data_result)
     """
     client = _get_client()
+
+    system_instruction = _BASE_SYSTEM_INSTRUCTION
+    if page_context_text:
+        system_instruction += "\n" + page_context_text
 
     response = client.models.generate_content(
         model=settings.gemini_model,
         contents=prompt,
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION,
+            system_instruction=system_instruction,
             tools=[DASHBOARD_TOOLS],
             temperature=0.0,
         ),
     )
 
     actions: list[DashboardAction] = []
+    data_result: DataResult | None = None
 
     for candidate in response.candidates:
         for part in candidate.content.parts:
-            if part.function_call:
-                action = _parse_function_call(part)
+            if not part.function_call:
+                continue
+
+            fc_name = part.function_call.name
+
+            if fc_name == "execute_query":
+                dr = _parse_execute_query(part)
+                if dr is not None:
+                    data_result = dr
+            else:
+                action = _parse_dashboard_action(part)
                 if action is not None:
                     actions.append(action)
 
-    if not actions:
+    if not actions and data_result is None:
         logger.warning("Gemini returned no function calls for prompt: %s", prompt)
 
-    return actions
+    return actions, data_result
